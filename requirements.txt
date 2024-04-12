@@ -1,0 +1,7 @@
+jupyter
+numpy
+pandas
+librosa
+scikit-learn
+scikit-fda
+ffmpeg
