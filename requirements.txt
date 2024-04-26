@@ -6,3 +6,4 @@ scikit-learn
 scikit-fda
 ffmpeg
 pydub
+seaborn
