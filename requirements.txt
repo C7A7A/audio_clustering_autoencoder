@@ -8,3 +8,4 @@ ffmpeg
 pydub
 seaborn
 fuzzy-c-means
+lightning 
