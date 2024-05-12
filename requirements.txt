@@ -9,3 +9,7 @@ pydub
 seaborn
 fuzzy-c-means
 lightning 
+pytorch
+torchvision 
+torchaudio  
+pytorch-cuda
