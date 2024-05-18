@@ -2,3 +2,4 @@
 datasets/*
 features/*
 metadata/*
+checkpoints/*

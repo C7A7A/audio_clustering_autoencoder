@@ -13,3 +13,5 @@ pytorch
 torchvision 
 torchaudio  
 pytorch-cuda
+tensorboard
+
