@@ -3,3 +3,4 @@ datasets/*
 features/*
 metadata/*
 checkpoints/*
+logs/*
