@@ -4,3 +4,5 @@ features/*
 metadata/*
 checkpoints/*
 logs/*
+notebooks/tensorboard/*
+tensorboard/*

@@ -2,7 +2,7 @@ from torch.utils.data import Dataset
 import numpy as np
 from PIL import Image
 
-WIDTH = 64
+WIDTH = 128
 HEIGHT = WIDTH // 2
 
 def load_img(path):
@@ -12,11 +12,13 @@ def load_img(path):
     if image.mode == 'RGBA':
         image = image.convert('RGB')
 
-    return np.array(image)
+    return image
+
 
 class FeaturesDataset(Dataset):
-    def __init__(self, paths, transform=None):
+    def __init__(self, paths, labels, transform=None):
         self.paths = paths
+        self.labels = labels
         self.transform = transform
         
     def __len__(self):
@@ -27,4 +29,7 @@ class FeaturesDataset(Dataset):
         feature = load_img(path)
         if self.transform:
             feature = self.transform(feature)
-        return feature
+            
+        label = self.labels[idx]
+        
+        return feature, label
