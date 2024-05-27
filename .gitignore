@@ -6,3 +6,4 @@ checkpoints/*
 logs/*
 notebooks/tensorboard/*
 tensorboard/*
+results/*
