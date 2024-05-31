@@ -2,7 +2,7 @@ from torch.utils.data import Dataset
 import numpy as np
 from PIL import Image
 
-WIDTH = 128
+WIDTH = 64
 HEIGHT = WIDTH // 2
 
 def load_img(path):
