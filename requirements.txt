@@ -14,4 +14,4 @@ torchvision
 torchaudio  
 pytorch-cuda
 tensorboard
-
+scikit-image
