@@ -5,12 +5,12 @@ from PIL import Image
 WIDTH = 64
 HEIGHT = WIDTH // 2
 
-def load_img(path):
+def load_img(path, width=WIDTH, height=HEIGHT):
     image = Image.open(path)
-    image = image.resize((WIDTH, HEIGHT))
+    image = image.resize((width, height))
 
-    if image.mode == 'RGBA':
-        image = image.convert('RGB')
+    # Convert image to grayscale (1 channel)
+    image = image.convert('L')
 
     return image
 
