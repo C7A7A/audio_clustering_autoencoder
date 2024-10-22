@@ -5,12 +5,15 @@ Based on this project I wrote my master thesis (written in polish): https://www.
 
 The study analysed the performance of different clustering algorithms on three diverse data sets. The methods operated on audio files that were represented by five audio features: spectrogram, mel-spectrogram, chromagram, MFCCs and MFCCs without the first cepstral coefficient. The research included classical clustering algorithms such as K-Means, Fuzzy C-Means, hierarchical agglomerative clustering and DBSCAN. In addition, a deep convolutional autoencoder architecture for clustering data was implemented. The paper describes in detail the processing and preparation of the audio files, which included the conversion of the raw audio data into suitable feature representations and their further preparation for analysis. Experimental results provide insight into the effectiveness of different clustering methods and their impact on the quality and precision of audio data clustering. 
 
+![AE](/images-readme/mel_spectrogram_color_grayscale.png)
+*Mel-spectrogram in color and grayscale. One of the features extracted to cluster audio data*
+
 ## Table of Contents
 - [Introduction](#introduction)
 - [Build with](#build-with)
 - [Getting started](#getting-started)
 - [Datasets](#datasets)
-- [Folders and files](#folders-and-files)
+- [Directories and files](#directories-and-files)
 - [Autoencoder](#autoencoder)
 - [Results](#results)
 - [Contributing](#contributing)
@@ -36,6 +39,7 @@ cd audio_clustering_autoencoder
 conda create --name myenv python=3.11.5
 conda activate myenv
 pip install -r requirements.txt
+cd notebooks
 jupyter notebook
 ```
 After that you should be ready to use all scripts located in /notebooks directory.
@@ -103,13 +107,115 @@ Dataset created by Kate Dupuis and M. Kathleen Pichora-Fuller at the University 
 
 *Number of files by actress and emotion*
 
+## Directories and files
+Directories in the project are used for:
+<ul>
+    <li> <b> notebooks </b> - To store jupyter notebook scripts. </li>
+    <li> <b> datasets </b> - To store datasets. Each dataset should be in a separate directory inside the <b> datasets </b> directory. </li>
+    <li> <b> metadata </b> - To store metadata extracted from dataset file and directory structure. </li>
+    <li> <b> features </b> - To store features extracted from audio files. </li>
+    <li> <b> checkpoints </b> - To store best autoencoder checkpoints. </li>
+    <li> <b> results </b> - To store images showing the results of clusterings. </li>
+    <li> <b> logs </b> - To store pytoch-lighting logs. </li>
+</ul>
 
-## Folders and files
+Inside <b> notebooks </b> directory there are 6 jupyter notebooks and 1 python file:
+<ul>
+    <li> <b> 01_save_metadata.ipynb </b> - This script saves relevant information about the dataset based on the directory structure of the dataset and the audio files themselves. The stored metadata included four elements: file name, file extension, path to the file, and a parent folder that served as a label. </li>
+    <li> <b> 02_transform_audio.ipynb </b> - This script uses previously prepared metadata to identify the files and convert them to a uniform WAV format and limit the frequency to a defined threshold. Conversion to WAV format is desirable because the librosa library works best with data with this extension. This audio file format is lossless and suitable for further data processing and analysis. Filtering of audio signals helped eliminate unwanted frequencies. A low-pass filter was used to limit the bandwidth of the signal to a preset threshold. Limiting the frequency allows to focus on the important frequency bands from the point of view of further data exploration. </li>
+    <li> <b> 03_extract_features.ipynb </b> - This script is focused on data extraction, that is, the process of selecting and properly preparing features. This is an extremely important stage that directly affects the final results of the analysis. The most important extracted features are plots generated from the audio files: spectrograms, mel-spectrograms, chromagrams, MFCCs. Each graph was saved as a grayscale image in PNG format and as a NumPy array in NPY format. For MFCCs, 20 mel-cepstral coefficients were selected. In addition, a first mel-cepstral coefficients was removed from the MFCCs and the chart thus created was saved similarly to the rest of the attributes. For the mel-spectrogram, 128 mel bands were selected. </li>
+    <li> <b> 04_cluster_audio.ipynb </b> - This script prepares the data for clustering and performs the clustering using classical clustering algorithms. To prepare the data, the code transforms it to one dimension and computes the corresponding means, checks if there are any missing values and replaces them with the means, normalizes the data, applies the PCA algorithm and estimates the number of clusters. Four algorithms (K-Means, Fuzzy C-Means, hierarchical agglomerative clustering and DBSCAN) were used for clustering. At first, the script visualizes the data with the original labels, searches for the best hyperparameters, performs clustering and presents the results in the form of visulization and tables. </li>
+    <li> <b> 05_autoencoder.ipynb </b> - This script prepares the data to be used as input for the autoencoder, implements the autoencoder architecture, uses it to group the data together with the K-Means algorithm, and visualizes the results in the form of tables and images. </li>
+    <li> <b> 00_prepare_US8K.ipynb </b> - A special script created for the UrbanSound8K dataset to transform its directory and file structure. </li>
+    <li> <b> FeaturesDataset.py </b> - The python file that is needed to make 05_autoencoder.ipynb work correctly with the input data for the autonecoder </li>
+</ul>
 
 ## Autoencoder
+A convolutional autoencoder and the K-Means algorithm were used to group audio files. The artificial intelligence model was designed to generate a compressed form of the input data (immersion), and the K-Means algorithm was used to group such a representation of the data. The autoencoder architecture was taken from the paper [Deep Clustering with Convolutional Autoencoders][DCEC], in which a convolutional autoencoder is part of a larger Deep Convolutional Embedded Clustering (DCEC) neural network. 
+
+![AE](/images-readme/ae.png)
+*Simple autoencoder architecture*
+
+The input data for the neural network were pre-generated images (spectrograms, mel-spectrograms, chromagrams, MFCCs, MFCCs without a zero line) with a size of 96x48. Such dimensions are due to two reasons: during experiments, the architecture received worse results with much larger images (i) and training models with larger images took too much time on local hardware (ii). 
+
+![AE](/images-readme/cae.png)
+*Implemented autonecoder architecture*
+
+In order to test whether the autoencoder implementation is correct, the popular MNIST dataset was clustered. This made it possible to compare the results of the implemented autoencoder in this work with the results of other autoencoders.
+
+![AE](/images-readme/mnist_reconstruction.png)
+*MNIST reconstruction*
 
 ## Results
-The results of the clustering experiments will be saved in the `results/` directory. You can visualize the clustering performance using the provided Jupyter notebooks.
+Tables with the best results for the number of clusters equal to the predefined number of labels. Much more analysis, visualizations and conclusions can be found in my master's thesis.
+
+#### [Music Audio Benchmark Data Set][MABDS]
+##### Classical Algorithms
+| **Feature**                   | **Type**  | **Algorithm** | **NMI** | **ACC** |
+|-------------------------------|-----------|---------------|---------|---------|
+| Spectrogram                   | Images    | K-Means       | 14%     | 26%     |
+| Mel-spectrogram                | Images    | FCM           | 12%     | 21%     |
+| MFCCs                         | Arrays    | FCM           | 12%     | 28%     |
+| MFCCs without first coefficient | Arrays    | FCM           | 11%     | 26%     |
+| Chromagram                    | Arrays    | K-Means       | 6%      | 18%     |
+
+##### Autoencoder
+| **Feature**                   | **Embedding** | **NMI** | **ACC** |
+|-------------------------------|---------------|---------|---------|
+| Spectrogram                   | 1024          | 16%     | 29%     |
+| Mel-spectrogram                | 128           | 15%     | 25%     |
+| MFCCs                         | 128           | 8%      | 19%     |
+| MFCCs without first coefficient | 1024          | 12%     | 21%     |
+| Chromagram                    | 128           | 8%      | 21%     |
+
+#### [UrbanSound8K][US8K]
+##### Classical Algorithms
+| **Feature**                   | **Type**  | **Algorithm** | **NMI** | **ACC** |
+|-------------------------------|-----------|---------------|---------|---------|
+| Spectrogram                   | Images    | K-Means       | 19%     | 25%     |
+| Mel-spectrogram                | Arrays    | FCM      | 18%     | 24%     |
+| MFCCs                         | Arrays    | K-Means  | 22%     | 31%     |
+| MFCCs without first coefficient | Arrays    | K-Means  | 23%     | 32%     |
+| Chromagram                    | Arrays    | K-Means       | 15%      | 21%     |
+
+##### Autoencoder
+| **Feature**                   | **Embedding** | **NMI** | **ACC** |
+|-------------------------------|---------------|---------|---------|
+| Spectrogram                   | 1024          | 20%     | 24%     |
+| Mel-spectrogram                | 128           | 21%     | 26%     |
+| MFCCs                         | 128           | 16%      | 22%     |
+| MFCCs without first coefficient | 1024          | 17%     | 23%     |
+| Chromagram                    | 128           | 17%      | 23%     |
+
+#### [Toronto Emotional Speech Set][TESS]
+##### Classical Algorithms
+| **Feature**                   | **Type**  | **Algorithm** | **NMI** | **ACC** |
+|-------------------------------|-----------|---------------|---------|---------|
+| Spectrogram                   | Images    | Agglomerative| 86%     | 80%     |
+| Mel-spectrogram                | Arrays    | Agglomerative| 78%     | 70%     |
+| MFCCs                         | Arrays    | Agglomerative| 94%     | 89%     |
+| MFCCs without first coefficient | Arrays    | Agglomerative| 93%     | 88%     |
+| Chromagram                    | Images    | Agglomerative| 53% | 44%     |
+
+##### Autoencoder
+| **Feature**                   | **Embedding** | **NMI** | **ACC** |
+|-------------------------------|---------------|---------|---------|
+| Spectrogram                   | 128          | 96%     | 90%     |
+| Mel-spectrogram                | 128           | 95%     | 88%     |
+| MFCCs                         | 1024           | 63%      | 61%     |
+| MFCCs without first coefficient | 128          | 79%     | 74%     |
+| Chromagram                    | 128           | 91%      | 21%     |
+
+### Conclusion based on thesis
+The study analyzed audio file clustering methods, focusing on their effectiveness and the results obtained. In order to achieve the intended objectives, a literature review of existing research on audio file clustering was conducted, which enabled the selection of appropriate approaches and tools. Subsequently, three diverse datasets were selected, which in subsequent stages were processed and properly prepared for further analysis. Data clustering was carried out using classical algorithms such as DBSCAN, hierarchical agglomerative clustering, K-Means and Fuzzy C-Means, using available python libraries. In addition, a deep convolutional autoencoder was implemented, which was used to group the data using modern artificial intelligence techniques. The results of the experiments were visualized to better illustrate and analyze the results.
+
+Clustering the three diverse datasets using different methods and evaluating them on several measures provided interesting insights. Although the results collected do not allow for clear conclusions, they provide a basis for drawing some interesting observations.
+
+For classical algorithms, DBSCAN was found to be unreliable and usually achieved the worst results. Hierarchical agglomerative clustering showed potential, as it sometimes achieved the best results of all the algorithms tested, but it is often problematic due to its tendency to create large clusters and many small clusters that contained individual objects. Nevertheless, this algorithm is interesting because it allows the user to determine where to divide the data into clusters, so the clusters created during clustering can be controlled to some extent. K-Means and FCM performed very similarly and usually achieved good results. MFCCs and MFCCs without first coeffiecient saved as arrays, usually achieved the best results. The use of PCA had minimal impact on the results.
+
+The results obtained with the simple autoencoder, which was originally designed to group small images from the MNIST dataset, proved comparable to classical algorithms for more complex audio data. This indicates the great potential of autoencoders and encourages further development and application of this clustering method in future studies. Smaller embeddings performed better in clustering, although they were slightly worse at reconstructing the original images than embeddings of larger size. The key, therefore, is to properly balance the size of the embeddings to ensure satisfactory reconstruction of the input data while keeping the size as small as possible, which promotes better clustering results. Among the features used, spectrograms and mel-spectrograms performed by far the best.
+
+It is worth noting that the data analysis mainly relied on NMI and ACC measures, which have proven to be more reliable in assessing clustering quality than internal measures. These measures, while useful in assessing cluster compactness and separation, do not always correlate with actual clustering quality. Therefore, they should not be the sole criterion for evaluation.
 
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
@@ -135,3 +241,5 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 [MABDS]: https://www-ai.cs.tu-dortmund.de/audio.html
 [US8K]: https://urbansounddataset.weebly.com/urbansound8k.html
 [TESS]: https://tspace.library.utoronto.ca/handle/1807/24487
+
+[DCEC]: https://xifengguo.github.io/papers/ICONIP17-DCEC.pdf
