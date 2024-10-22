@@ -1,10 +1,22 @@
 # User defined
 datasets/*
+!datasets/.gitkeep
+
 features/*
+!features/.gitkeep
+
 metadata/*
+!metadata/.gitkeep
+
 checkpoints/*
+!checkpoints/.gitkeep
+
 logs/*
+!logs/.gitkeep
+
+results/*
+!results/.gitkeep
+
 notebooks/tensorboard/*
 notebooks/lightning_logs/*
 tensorboard/*
-results/*
